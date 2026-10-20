@@ -12,31 +12,20 @@ cursor.execute("""
     );
 """)
 
-# cursor.execute("""
-#     INSERT INTO categories (name)
-#     VALUES ('mat');
-# """)
+def add_expense():
+    amount = float(input("Ange belopp:"))
+    description = input("Ange beskrivning:")
+    category_id = int(input("Ange kategori-id:"))
 
-# cursor.execute("""
-#     INSERT INTO categories (name)
-#     VALUES ('Transport');
-# """) 
+    cursor.execute("""
+        INSERT INTO expenses (amount, description, category_id)
+        VALUES (?, ?, ?)
+    """, (amount, description, category_id))
 
-cursor.execute("""
-    DELETE FROM categories
-    WHERE category_id > 2;
-""")
+    conn.commit()
 
-cursor.execute("""
-    SELECT * FROM categories;
-""")
+    print("Utgiften har sparats!")
 
-rows = cursor.fetchall()
-print(rows)
+add_expense()
 
-amount = float(input("Ange belopp:"))
-description = input("Ange beskrivning:")
-category_id = int(input("Ange kategori-id:"))
-
-conn.commit()
 conn.close()
