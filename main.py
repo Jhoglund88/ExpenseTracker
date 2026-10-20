@@ -2,6 +2,7 @@ import sqlite3
 
 conn = sqlite3.connect("expenses.db")
 
+
 cursor = conn.cursor()
 
 cursor.execute("""
@@ -32,6 +33,10 @@ cursor.execute("""
 
 rows = cursor.fetchall()
 print(rows)
+
+amount = float(input("Ange belopp:"))
+description = input("Ange beskrivning:")
+category_id = int(input("Ange kategori-id:"))
 
 conn.commit()
 conn.close()
