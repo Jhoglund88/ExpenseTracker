@@ -2,6 +2,8 @@ import sqlite3
 
 conn = sqlite3.connect("expenses.db")
 
+conn.execute("PRAGMA foreign_keys = ON")
+
 
 cursor = conn.cursor()
 
@@ -26,6 +28,18 @@ def add_expense():
 
     print("Utgiften har sparats!")
 
-add_expense()
+def show_expenses():
+    cursor.execute("""
+    SELECT expenses.amount, expenses.description, categories.name
+    FROM expenses
+    JOIN categories
+    ON expenses.category_id = categories.category_id
+""")
+    expenses = cursor.fetchall()
 
+    for expense in expenses:
+        print(f"{expense[0]} kr - {expense[1]} - {expense[2]}")
+
+add_expense()
+show_expenses()
 conn.close()
