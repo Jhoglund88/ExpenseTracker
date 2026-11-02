@@ -17,3 +17,6 @@ JOIN categories
 ON expenses.category_id = categories.category_id
 WHERE categories.name = 'mat'
 ORDER BY amount ASC;
+
+SELECT * FROM categories;
+
