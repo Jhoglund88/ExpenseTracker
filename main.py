@@ -57,7 +57,7 @@ def add_expense():
 
 def show_expenses():
     cursor.execute("""
-    SELECT expenses.amount, expenses.description, categories.name
+    SELECT expenses.expense_id, expenses.amount, expenses.description, categories.name
     FROM expenses
     JOIN categories
     ON expenses.category_id = categories.category_id
@@ -65,7 +65,7 @@ def show_expenses():
     expenses = cursor.fetchall()
 
     for expense in expenses:
-        print(f"{expense[0]} kr - {expense[1]} - {expense[2]}")
+        print(f"ID: {expense[0]} - {expense[1]}kr - {expense[2]} - {expense[3]}")
 
 def show_category_totals():
     cursor.execute("""
@@ -82,14 +82,83 @@ def show_category_totals():
     for category, total in category_totals:
         print(f"{category}: {total:.2f} kr")
 
+def delete_expense():
+    while True:
+        try:
+            delete_choice = int(input("Ange ID för utgiften du vill ta bort:"))
+            break
+        except ValueError:
+            print("\nOgiltigt ID. Försök igen.")
+            
+
+    cursor.execute("DELETE FROM expenses WHERE expense_id = ?", (delete_choice,))
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        print("Inget ID matchar det numret")
+    else:
+        print("Valt ID har tagits bort")
+
+def update_expenses():
+    show_expenses()
+    while True:
+        try:
+            update_choice = int(input("Ange ID för utgiften du vill uppdatera:"))
+            break
+        except ValueError:
+            print("\nOgiltigt ID. Försök igen.")
+
+    cursor.execute("SELECT * FROM expenses WHERE expense_id = ?", (update_choice,))
+    expense = cursor.fetchone()
+
+    if expense is None:
+        print("Inget ID matchar det numret")
+        return
+
+    try:
+        new_amount = float(input("Ange nytt belopp:"))
+    except ValueError:
+        print("Ogiltigt belopp. Försök igen.")
+        return
+
+    if new_amount <= 0:
+        print("Beloppet måste vara större än noll. Försök igen.")
+        return
+
+    new_description = input("Ange ny beskrivning:")
+
+    cursor.execute("""
+        UPDATE expenses
+        SET amount = ?, description = ?
+        WHERE expense_id = ?
+    """, (new_amount, new_description, update_choice))
+
+    conn.commit()
+
+    print("Utgiften har uppdaterats!")
+
+def show_recent_expenses():
+    cursor.execute("""
+       SELECT * FROM expenses
+    ORDER BY expense_id DESC
+    LIMIT 10; """)
+
+    for expense in cursor.fetchall():
+        print(f"ID: {expense[0]} - {expense[1]}kr - {expense[2]} - Kategori ID: {expense[3]}")
+
+   
+       
+
 while True:
     print("\nVälj ett alternativ:")
     print("1. Lägg till utgift")
     print("2. Visa alla utgifter")
     print("3. Visa totaler per kategori")
-    print("4. Avsluta")
+    print("4. Ta bort utgift")
+    print("5. Uppdatera utgift")
+    print("6. Avsluta")
 
-    choice = input("Ange ditt val (1-4): ")
+    choice = input("Ange ditt val (1-6): ")
 
     if choice == "1":
         add_expense()
@@ -98,6 +167,11 @@ while True:
     elif choice == "3":
         show_category_totals()
     elif choice == "4":
+        delete_expense()
+    elif choice == "5":
+        update_expenses()
+    elif choice == "6":
+        print("Avslutar programmet.")
         break
     else:
         print("Ogiltigt val. Försök igen.")

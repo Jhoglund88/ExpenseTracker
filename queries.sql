@@ -20,3 +20,9 @@ ORDER BY amount ASC;
 
 SELECT * FROM categories;
 
+SELECT *
+FROM expenses
+WHERE category_id NOT IN (
+    SELECT category_id FROM categories
+);
+
